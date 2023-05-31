@@ -1,8 +1,8 @@
-﻿implement main
+implement main
     open core, stdio
 
 domains
-            name = string.
+    name = string.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -40,14 +40,14 @@ clauses
     run() :-
         printEmployees(),
         write("Enter employee id to update: "),
-        X = stdio::readLine(),
+        X = toTerm(stdio::readLine()),
         write("Enter employee name: "),
         Y = stdio::readLine(),
         write("Enter employee gender: "),
         Z = stdio::readLine(),
         write("Enter employee birthday: "),
         W = stdio::readLine(),
-        updateEmployee(toTerm(X), toTerm(Y), toTerm(Z), toTerm(W)),
+        updateEmployee(X, toTerm(Y), toTerm(Z), toTerm(W)),
         printEmployees(),
         _ = stdio::readLine().
 
@@ -86,17 +86,17 @@ clauses
     run() :-
         printDepartments(),
         write("Enter department id to update: "),
-        X = stdio::readLine(),
+        X = toTerm(stdio::readLine()),
         write("Enter department name: "),
         Y = stdio::readLine(),
-        updateDepartment(toTerm(X), toTerm(Y)),
+        updateDepartment(X, toTerm(Y)),
         printDepartments(),
         _ = stdio::readLine(),
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 class facts
-        position:(integer Id, name, name, integer Id).
+    position:(integer Id, name, name, integer Id).
 
 clauses
     position(111, "Менеджер", "Отдел продажами", 11).
@@ -113,7 +113,7 @@ clauses
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 class facts
-        occupation:(integer Id, integer Id, name).
+    occupation:(integer Id, integer Id, name).
 clauses
     occupation(1, 111, "2015, 9, 1").
     occupation(2, 112, "2010, 6, 1").
@@ -124,7 +124,7 @@ clauses
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 class facts
-        salary:(integer Id, integer Salary).
+    salary:(integer Id, integer Salary).
 clauses
     salary(1, 50000).
     salary(2, 80000).
@@ -139,59 +139,48 @@ class predicates
 
 clauses
     average_salary(Avg) :-
-    findall(Salary, salary(_, Salary), Salaries),
-    sum_list(Salaries, Total),
-    length(Salaries, Count),
-    Avg = Total / Count.
+        findall(Salary, salary(_, Salary), Salaries),
+        sum_list(Salaries, Total),
+        length(Salaries, Count),
+        Avg is Total / Count.
 
 clauses
     printSalaries :-
-    format("ID\tSalary~n"),
-    forall(salary(ID, Salary),
-    format("~w\t~w~n", [ID, Salary])).
+        format("ID\tSalary~n"),
+        forall(salary(ID, Salary),
+               format("~w\t~w~n", [ID, Salary])).
 
 clauses
     increaseSalary(Increase) :-
         retract(salary(ID, Salary)),
-        NewSalary = Salary + Increase,
+        NewSalary is Salary + Increase,
         assert(salary(ID, NewSalary)),
-    fail.
+        fail.
     increaseSalary(_).
 
 clauses
-    printSalaries :-
-        average_salary(Avg),
-        format("Average Salary: ~w~n~n", [Avg]),
+    run() :-
+        printSalaries(),
         write("Enter a number to increase salaries: "),
         read_line_to_string(user_input, Input),
         atom_number(Input, Increase),
         increaseSalary(Increase),
-        printSalaries,
+        printSalaries(),
         average_salary(NewAvg),
         format("New Average Salary: ~w~n", [NewAvg]).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+class facts
+    vacancy:(name, integer Salary).
 clauses
-       run() :-
-        printSalaries(),
-        X = stdio::readLine(),
-        increaseSalary(toTerm(X)),
-        printStips(),
-        _ = stdio::readLine(),
-
-
+    vacancy("Трафик-менеджер", 60000).
+    vacancy("Бренд-менеджер", 80000).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 class facts
-        vacancy:(name, integer Salary ).
-clauses
-vacancy("Трафик-менеджер", 60000).
-vacancy("Бренд-менеджер", 80000).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-class facts
-        expenses:(integer Id, integer Salary ).
+    expenses:(integer Id, integer Salary).
 clauses
     expenses(11, 100000).
     expenses(22, 150000).
@@ -200,26 +189,26 @@ clauses
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 class facts
-        intern:(integer Id, name, string Gender, string Birthday).
+    intern:(integer Id, name, string Gender, string Birthday).
 clauses
-        intern(8, "Смирнова Екатерина Александровна", "женский", "1995, 8, 25").
+    intern(8, "Смирнова Екатерина Александровна", "женский", "1995, 8, 25").
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 class facts
-        office:(integer Id, name).
+    office:(integer Id, name).
 clauses
-     office(1111, "Москва").
-     office(2222, "Санкт-Петербург").
-     office(3333, "Душанбе").
+    office(1111, "Москва").
+    office(2222, "Санкт-Петербург").
+    office(3333, "Душанбе").
 
 class predicates
     printFindOffice: ().
 
 clauses
-printFindOffice() :-
+    printFindOffice() :-
         office(Id, name),
-        write(Id, ":\t", City, " - "),
+        write(Id, ":\t", name, " - "),
         nl,
         fail.
     printFindOffice() :-
@@ -228,56 +217,38 @@ printFindOffice() :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 class facts
-        dismissal:(integer Id, name).
+    dismissal:(integer Id, name).
 clauses
-        dismissal(3, "Bob Johnson").
-        dismissal(5, "Bob Johnson").
+    dismissal(3, "Bob Johnson").
+    dismissal(5, "Bob Johnson").
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 class facts
-        increase:(integer Id, name, integer Salary1,integer Salary1).
+    increase:(integer Id, name, integer Salary1, integer Salary1).
 
 clauses
-        increase(1, "John Smith", 50000, 70000).
-        increase(2, "Jane Doe", 80000, 1000000).
-        increase(4, "Alice Brown", 99999, 700000).
+    increase(1, "John Smith", 50000, 70000).
+    increase(2, "Jane Doe", 80000, 1000000).
+    increase(4, "Alice Brown", 99999, 700000).
 
 class predicates
-        is_it_possible: (integer X, integer Y [out]).
+    is_it_possible: (integer X, integer Y).
 
 clauses
-          is_it_possible(X, Y) :-
+    is_it_possible(X, Y) :-
         X - Y < 25000,
-        !,
         write("Можно").
-
-          is_it_possible(X, Y) :-
+    is_it_possible(X, Y) :-
         X - Y > 25000,
-        !,
-         write("Нельзя").
-
+        write("Нельзя").
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 class facts
-        intern:(integer Id, name, string Gender, string Birthday).
+    intern:(integer Id, name, string Gender, string Birthday).
 clauses
-        intern(8, "Смирнова Екатерина Александровна", "женский", "1995, 8, 25").
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-class facts
-        intern:(integer Id, name, string Gender, string Birthday).
-clauses
-        intern(8, "Смирнова Екатерина Александровна", "женский", "1995, 8, 25").
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-class facts
-        intern:(integer Id, name, string Gender, string Birthday).
-clauses
-        intern(8, "Смирнова Екатерина Александровна", "женский", "1995, 8, 25").
+    intern(8, "Смирнова Екатерина Александровна", "женский", "1995, 8, 25").
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
